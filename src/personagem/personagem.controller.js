@@ -1,4 +1,5 @@
-const service = require('./personagem.service')
+
+const service = require('./personagem.service');
 
 async function readAll(req, res) {
   //Acessamos a lista de personagens no service
@@ -11,6 +12,11 @@ async function readAll(req, res) {
 async function readById(req, res) {
   //Acessamos o parâmetro de rota pelo ID
   const id = req.params.id
+
+  //Verificão de ObjectId inválido
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).send({ error: 'ObjectId inválido'});
+  }
 
   //Acessamos o personagem no service através Id
   const item = await service.readById(id)
