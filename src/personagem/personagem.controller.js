@@ -1,4 +1,5 @@
 
+const personagem = require('./personagem.entity');
 const service = require('./personagem.service');
 
 async function readAll(req, res) {
@@ -31,12 +32,13 @@ async function readById(req, res) {
 }
 
 async function create(req, res) {
-  //Acessamos o Body da requisição
-  const newItem = req.body
+  //Acessamos e Validamos o Body da requisição
+  const {error, value: newItem } = personagem.validate(req.body) 
 
-  // Checar se o ´nome´ está presente no body
-  if (!newItem || !newItem.nome) {
-    return res.status(400).send('Corpo da requesição deve conter a propriedade nome.')
+  
+  // Checar se temos algum erro na validação
+  if (error) {
+    return res.status(400).send({ error: error.details[0].message})
   }
 
   //Adicionamos no Data Base através do Service 
@@ -51,13 +53,15 @@ async function updateById(req, res) {
    const id = req.params.id
 
 
-   //Acessamos o Body da requisição 
-   const newItem = req.body
+  //Acessamos e validamos o Body da requisição
+  const {error, value } = personagem.validate(req.body) 
 
-   // Checar se o ´nome´ está presente no body
-   if (!newItem || !newItem.nome) {
-     return res.status(400).send('Corpo da requesição deve conter a propriedade nome.')
-   }
+  const newItem = value
+
+  // Checar se temos algum erro na validação
+  if (error) {
+    return res.status(400).send({ error: error.details[0].message})
+  }
 
     //Atualizamos no DB o newItem pelo ID, usando o Service
     await service.updateById(id, newItem)
